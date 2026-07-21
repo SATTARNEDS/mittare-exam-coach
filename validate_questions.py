@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 
 from extra_questions import EXTRA_QUESTIONS
+from pdf_questions_2567 import PDF_QUESTIONS_2567
 
 
 def read_app_questions() -> list[tuple]:
@@ -30,7 +31,7 @@ def read_app_questions() -> list[tuple]:
 
 
 def validate() -> None:
-    rows = read_app_questions() + EXTRA_QUESTIONS
+    rows = read_app_questions() + EXTRA_QUESTIONS + PDF_QUESTIONS_2567
     errors: list[str] = []
     seen_ids: set[int] = set()
     seen_questions: set[str] = set()
@@ -52,9 +53,9 @@ def validate() -> None:
         if not all(str(value).strip() for value in (topic, question, answer, explanation)):
             errors.append(f"ข้อ {question_id}: มีข้อมูลสำคัญว่าง")
 
-    expected_ids = set(range(1, 121))
+    expected_ids = set(range(1, 121)) | set(range(1001, 1941))
     if seen_ids != expected_ids:
-        errors.append(f"เลขข้อไม่ครบ 1-120: {sorted(expected_ids - seen_ids)}")
+        errors.append(f"เลขข้อไม่ครบตามชุดข้อมูล: {sorted(expected_ids - seen_ids)}")
     if errors:
         raise SystemExit("\n".join(errors))
 

@@ -14,6 +14,7 @@ from flask import Flask, g, jsonify, request, send_from_directory, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from extra_questions import EXTRA_QUESTIONS
+from pdf_questions_2567 import PDF_QUESTIONS_2567
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
@@ -188,6 +189,21 @@ def initialize_database() -> None:
         ON CONFLICT(id) DO NOTHING
         """,
         [(row[0], row[1], row[2], json.dumps(row[3], ensure_ascii=False), row[4], row[5]) for row in seed_rows],
+    )
+    database.executemany(
+        """
+        INSERT INTO questions(id, topic, question_text, options_json, correct_answer, explanation,
+                              source_title, status, is_active, published_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'published', 1, CURRENT_TIMESTAMP)
+        ON CONFLICT(id) DO NOTHING
+        """,
+        [
+            (
+                row[0], row[1], row[2], json.dumps(row[3], ensure_ascii=False), row[4], row[5],
+                "แนวข้อสอบนายหน้าประกันภัย 2567 ได้จากแหววมา.pdf (หัวเอกสารระบุอัปเดต 2565)",
+            )
+            for row in PDF_QUESTIONS_2567
+        ],
     )
     bootstrap_username = os.environ.get("ADMIN_USERNAME", "").strip()
     bootstrap_password = os.environ.get("ADMIN_PASSWORD", "")
